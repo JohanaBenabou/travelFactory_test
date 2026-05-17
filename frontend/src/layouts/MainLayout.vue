@@ -1,430 +1,95 @@
 <template>
-  <div class="space-y-6">
+  <div class="flex min-h-screen bg-gray-100">
 
-    <div
-      class="grid grid-cols-1 md:grid-cols-3 gap-6"
+    <aside
+      class="w-64 bg-slate-900 text-white p-6 flex flex-col"
     >
 
-      <div
-        class="bg-white rounded-xl shadow-sm p-6"
-      >
-        <p class="text-gray-500 mb-2">
-          Total Requests
+      <div class="mb-10">
+
+        <h1 class="text-3xl font-bold">
+          Vacation App
+        </h1>
+
+        <p class="text-slate-400 mt-2 text-sm">
+          Employee Management
         </p>
 
-        <h3 class="text-3xl font-bold">
-          {{ vacations.length }}
-        </h3>
       </div>
 
-      <div
-        class="bg-white rounded-xl shadow-sm p-6"
-      >
-        <p class="text-gray-500 mb-2">
-          Approved
-        </p>
+      <nav class="space-y-3">
 
-        <h3
-          class="text-3xl font-bold text-green-600"
+        <router-link
+          to="/"
+          class="block p-3 rounded-lg transition hover:bg-slate-800"
+          active-class="bg-blue-600"
         >
-          {{ approvedCount }}
-        </h3>
-      </div>
+          Requester
+        </router-link>
 
-      <div
-        class="bg-white rounded-xl shadow-sm p-6"
-      >
-        <p class="text-gray-500 mb-2">
-          Pending
-        </p>
-
-        <h3
-          class="text-3xl font-bold text-yellow-500"
+        <router-link
+          to="/validator"
+          class="block p-3 rounded-lg transition hover:bg-slate-800"
+          active-class="bg-blue-600"
         >
-          {{ pendingCount }}
-        </h3>
-      </div>
+          Validator
+        </router-link>
 
-    </div>
-
-    <div
-      class="bg-white rounded-xl shadow-sm p-6"
-    >
+      </nav>
 
       <div
-        class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6"
+        class="mt-auto pt-10 text-sm text-slate-400"
+      >
+        Travel Factory Technical Test
+      </div>
+
+    </aside>
+
+    <main class="flex-1 p-6">
+
+      <div
+        class="bg-white rounded-xl shadow-sm p-4 mb-6 flex justify-between items-center"
       >
 
         <div>
-          <h3 class="text-2xl font-semibold">
-            Vacation Requests
-          </h3>
 
-          <p class="text-gray-500 mt-1">
-            Review and manage employee vacations
+          <h2 class="text-2xl font-semibold">
+            Vacation Management Dashboard
+          </h2>
+
+          <p class="text-gray-500 text-sm mt-1">
+            Manage employee vacation requests
           </p>
+
         </div>
 
-        <select
-          v-model="selectedStatus"
-          class="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">
-            All Statuses
-          </option>
+        <div class="flex items-center gap-3">
 
-          <option value="Pending">
-            Pending
-          </option>
-
-          <option value="Approved">
-            Approved
-          </option>
-
-          <option value="Rejected">
-            Rejected
-          </option>
-        </select>
-
-      </div>
-
-      <div
-        v-if="loading"
-        class="text-center py-10 text-gray-500"
-      >
-        Loading vacation requests...
-      </div>
-
-      <div
-        v-else-if="filteredVacations.length === 0"
-        class="text-center text-gray-500 py-10"
-      >
-        No vacation requests found.
-      </div>
-
-      <div
-        v-else
-        class="overflow-x-auto"
-      >
-
-        <table class="min-w-full">
-
-          <thead>
-
-            <tr
-              class="border-b text-left text-gray-500"
-            >
-              <th class="p-4 font-medium">
-                Employee
-              </th>
-
-              <th class="p-4 font-medium">
-                Start
-              </th>
-
-              <th class="p-4 font-medium">
-                End
-              </th>
-
-              <th class="p-4 font-medium">
-                Reason
-              </th>
-
-              <th class="p-4 font-medium">
-                Status
-              </th>
-
-              <th class="p-4 font-medium">
-                Actions
-              </th>
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            <tr
-              v-for="vacation in filteredVacations"
-              :key="vacation.id"
-              class="border-b hover:bg-gray-50 transition"
-            >
-
-              <td class="p-4 font-medium">
-                {{ vacation.user.name }}
-              </td>
-
-              <td class="p-4">
-                {{ vacation.start_date }}
-              </td>
-
-              <td class="p-4">
-                {{ vacation.end_date }}
-              </td>
-
-              <td class="p-4">
-                {{
-                  vacation.reason ||
-                  "No reason provided"
-                }}
-              </td>
-
-              <td class="p-4">
-
-                <span
-                  class="px-3 py-1 rounded-full text-sm font-medium"
-                  :class="getStatusClass(vacation.status)"
-                >
-                  {{ vacation.status }}
-                </span>
-
-              </td>
-
-              <td class="p-4">
-
-                <div
-                  v-if="vacation.status === 'Pending'"
-                  class="flex gap-2"
-                >
-
-                  <button
-                    @click="approveVacation(vacation.id)"
-                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition shadow-sm"
-                  >
-                    Approve
-                  </button>
-
-                  <button
-                    @click="openRejectModal(vacation.id)"
-                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition shadow-sm"
-                  >
-                    Reject
-                  </button>
-
-                </div>
-
-                <div
-                  v-else
-                  class="text-gray-400 text-sm"
-                >
-                  No actions available
-                </div>
-
-              </td>
-
-            </tr>
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-    <div
-      v-if="showRejectModal"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-    >
-
-      <div
-        class="bg-white rounded-xl p-6 w-full max-w-md shadow-xl"
-      >
-
-        <h3 class="text-xl font-semibold mb-2">
-          Reject Vacation Request
-        </h3>
-
-        <p class="text-gray-500 mb-4">
-          Please provide a reason for rejecting this request.
-        </p>
-
-        <textarea
-          v-model="rejectComment"
-          placeholder="Enter rejection reason..."
-          class="w-full border rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-red-400"
-          rows="4"
-        />
-
-        <div
-          v-if="rejectError"
-          class="text-red-500 text-sm mb-4"
-        >
-          {{ rejectError }}
-        </div>
-
-        <div class="flex justify-end gap-3">
-
-          <button
-            @click="closeRejectModal"
-            class="px-4 py-2 border rounded-lg hover:bg-gray-100 transition"
+          <div
+            class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold"
           >
-            Cancel
-          </button>
+            J
+          </div>
 
-          <button
-            @click="rejectVacation"
-            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
-          >
-            Reject Request
-          </button>
+          <div>
+
+            <p class="font-semibold">
+              Johana
+            </p>
+
+            <p class="text-sm text-gray-500">
+              Employee
+            </p>
+
+          </div>
 
         </div>
 
       </div>
 
-    </div>
+      <router-view />
+
+    </main>
 
   </div>
 </template>
-
-<script setup lang="ts">
-import {
-  ref,
-  computed,
-  onMounted,
-} from "vue";
-
-import api from "../services/api";
-
-const vacations = ref<any[]>([]);
-
-const selectedStatus = ref("");
-
-const loading = ref(false);
-
-const showRejectModal = ref(false);
-
-const selectedVacationId = ref<number | null>(
-  null
-);
-
-const rejectComment = ref("");
-
-const rejectError = ref("");
-
-const fetchVacations = async () => {
-  try {
-    loading.value = true;
-
-    const response = await api.get(
-      "/vacations"
-    );
-
-    vacations.value = response.data;
-
-  } catch (error) {
-    console.log(error);
-
-  } finally {
-    loading.value = false;
-  }
-};
-
-const approveVacation = async (
-  id: number
-) => {
-  try {
-    await api.patch(
-      `/vacations/${id}`,
-      {
-        status: "Approved",
-      }
-    );
-
-    fetchVacations();
-
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const openRejectModal = (
-  id: number
-) => {
-  selectedVacationId.value = id;
-
-  showRejectModal.value = true;
-};
-
-const closeRejectModal = () => {
-  showRejectModal.value = false;
-
-  rejectComment.value = "";
-
-  rejectError.value = "";
-
-  selectedVacationId.value = null;
-};
-
-const rejectVacation = async () => {
-  try {
-    rejectError.value = "";
-
-    if (!rejectComment.value.trim()) {
-      rejectError.value =
-        "Rejection comment is required";
-
-      return;
-    }
-
-    await api.patch(
-      `/vacations/${selectedVacationId.value}`,
-      {
-        status: "Rejected",
-        comments: rejectComment.value,
-      }
-    );
-
-    closeRejectModal();
-
-    fetchVacations();
-
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const filteredVacations = computed(() => {
-  if (!selectedStatus.value) {
-    return vacations.value;
-  }
-
-  return vacations.value.filter(
-    (vacation) =>
-      vacation.status ===
-      selectedStatus.value
-  );
-});
-
-const approvedCount = computed(() => {
-  return vacations.value.filter(
-    (vacation) =>
-      vacation.status === "Approved"
-  ).length;
-});
-
-const pendingCount = computed(() => {
-  return vacations.value.filter(
-    (vacation) =>
-      vacation.status === "Pending"
-  ).length;
-});
-
-const getStatusClass = (
-  status: string
-) => {
-  if (status === "Approved") {
-    return "bg-green-100 text-green-700";
-  }
-
-  if (status === "Rejected") {
-    return "bg-red-100 text-red-700";
-  }
-
-  return "bg-yellow-100 text-yellow-700";
-};
-
-onMounted(() => {
-  fetchVacations();
-});
-</script>
