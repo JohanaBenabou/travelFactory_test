@@ -1,9 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 
 import { VacationRequest } from "./VacationRequest";
 
@@ -18,9 +13,14 @@ export class User {
   @Column()
   role!: string;
 
-  @OneToMany(
-    () => VacationRequest,
-    (request) => request.user
-  )
+  @OneToMany(() => VacationRequest, (request) => request.user)
   requests!: VacationRequest[];
+
+  @Column({
+    unique: true,
+  })
+  email!: string;
+
+  @Column()
+  password!: string;
 }

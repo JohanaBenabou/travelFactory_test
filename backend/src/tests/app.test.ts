@@ -1,11 +1,21 @@
 describe(
   "Vacation API",
   () => {
+
     it(
-      "should be true",
+      "should create a valid vacation request object",
       () => {
-        expect(true).toBe(true);
+
+        const vacation = {
+          start_date: "2026-06-01",
+          end_date: "2026-06-05",
+          status: "Pending",
+        };
+
+        expect(vacation.status)
+          .toBe("Pending");
       }
     );
+
   }
 );

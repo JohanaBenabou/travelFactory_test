@@ -63,11 +63,10 @@
         </span>
       </div>
 
-      <div
-        v-if="vacations.length === 0"
-        class="text-center text-gray-500 py-10"
-      >
-        No vacation requests yet.
+      <div v-if="vacations.length === 0" class="text-center py-16">
+        <p class="text-5xl mb-4">✈️</p>
+
+        <p class="text-gray-500 text-lg">No vacation requests yet</p>
       </div>
 
       <div
@@ -117,6 +116,13 @@ import { ref, onMounted } from "vue";
 
 import api from "../services/api";
 
+const storedUser = localStorage.getItem("user");
+
+const user =
+  storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null;
+
+console.log(user);
+
 const vacations = ref<any[]>([]);
 
 const loading = ref(false);
@@ -131,7 +137,7 @@ const form = ref({
 
 const fetchVacations = async () => {
   try {
-    const response = await api.get("/vacations/user/1");
+    const response = await api.get(`/vacations/user/${user.id}`);
 
     vacations.value = response.data;
   } catch (error) {
@@ -145,10 +151,21 @@ const submitVacation = async () => {
 
     successMessage.value = "";
 
-    await api.post("/vacations", {
-      user_id: 1,
-      ...form.value,
+    console.log("USER:", user);
+
+    console.log("FORM:", form.value);
+
+    const response = await api.post("/vacations", {
+      user_id: user.id,
+
+      start_date: form.value.start_date,
+
+      end_date: form.value.end_date,
+
+      reason: form.value.reason,
     });
+
+    console.log("VACATION CREATED:", response.data);
 
     successMessage.value = "Vacation request submitted successfully";
 
@@ -158,13 +175,17 @@ const submitVacation = async () => {
       reason: "",
     };
 
-    fetchVacations();
+    await fetchVacations();
 
     setTimeout(() => {
       successMessage.value = "";
-    }, 3000);
-  } catch (error) {
+    }, 5000);
+  } catch (error: any) {
+    console.log("VACATION ERROR:");
+
     console.log(error);
+
+    console.log(error.response);
   } finally {
     loading.value = false;
   }

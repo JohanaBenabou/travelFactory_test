@@ -1,4 +1,6 @@
-import { Router } from "express";
+import {
+  Router,
+} from "express";
 
 import {
   createVacationRequest,
@@ -9,12 +11,24 @@ import {
 
 const router = Router();
 
-router.post("/", createVacationRequest);
+router.post(
+  "/",
+  createVacationRequest
+);
 
-router.get("/", getAllVacationRequests);
+router.get(
+  "/",
+  getAllVacationRequests
+);
 
-router.get("/user/:id", getVacationRequestsByUser);
+router.get(
+  "/user/:id",
+  getVacationRequestsByUser
+);
 
-router.patch("/:id", updateVacationRequestStatus);
+router.patch(
+  "/:id",
+  updateVacationRequestStatus
+);
 
 export default router;
