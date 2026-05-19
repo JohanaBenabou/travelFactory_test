@@ -213,6 +213,15 @@ Filter requests by status
 Approve or reject requests
 Add comments when rejecting
 
+## Database Import
+
+Create PostgreSQL database:
+
+```txt
+vacation_management
+Then import:
+psql -U postgres -d vacation_management -f database.sql
+
 Author
 
 Johana Benabou
